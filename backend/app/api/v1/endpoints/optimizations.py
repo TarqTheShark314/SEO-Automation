@@ -177,9 +177,9 @@ async def approve_optimization(
 @router.post("/{optimization_id}/reject", response_model=OptimizationResponse)
 async def reject_optimization(
     optimization_id: int,
-    reason: Optional[str] = None,
     current_user: Annotated[User, Depends(get_current_active_user)],
     db: AsyncSession = Depends(get_db),
+    reason: Optional[str] = None,
 ):
     """Reject an optimization."""
     result = await db.execute(
