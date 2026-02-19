@@ -114,7 +114,7 @@ class Optimization(Base):
     auto_deploy: Mapped[bool] = mapped_column(Boolean, default=False)
 
     # Metadata
-    metadata: Mapped[Optional[dict]] = mapped_column(JSON)
+    extra_data: Mapped[Optional[dict]] = mapped_column(JSON)
 
     # Timestamps
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.utcnow)

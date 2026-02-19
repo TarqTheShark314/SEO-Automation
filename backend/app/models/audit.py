@@ -196,7 +196,7 @@ class AuditIssue(Base):
     fixed_by: Mapped[Optional[str]] = mapped_column(String(50))  # user, auto, manual
 
     # Additional Data
-    metadata: Mapped[Optional[dict]] = mapped_column(JSON)
+    extra_data: Mapped[Optional[dict]] = mapped_column(JSON)
 
     # Timestamps
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.utcnow)
