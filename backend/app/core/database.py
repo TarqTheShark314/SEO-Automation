@@ -17,12 +17,14 @@ class Base(DeclarativeBase):
     pass
 
 
-# Create async engine with SSL for Supabase
-import ssl
-
-ssl_context = ssl.create_default_context()
-ssl_context.check_hostname = False
-ssl_context.verify_mode = ssl.CERT_NONE
+# Use SSL only for Supabase connections, not local PostgreSQL
+connect_args = {}
+if "supabase" in settings.DATABASE_URL:
+    import ssl
+    ssl_context = ssl.create_default_context()
+    ssl_context.check_hostname = False
+    ssl_context.verify_mode = ssl.CERT_NONE
+    connect_args["ssl"] = ssl_context
 
 engine = create_async_engine(
     settings.DATABASE_URL,
@@ -30,7 +32,7 @@ engine = create_async_engine(
     pool_size=settings.DATABASE_POOL_SIZE,
     max_overflow=settings.DATABASE_MAX_OVERFLOW,
     pool_pre_ping=True,
-    connect_args={"ssl": ssl_context},
+    connect_args=connect_args,
 )
 
 # Create async session factory
