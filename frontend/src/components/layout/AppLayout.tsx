@@ -1,48 +1,21 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import Sidebar from './Sidebar'
 import { useAppStore } from '@/lib/store'
-import { authAPI, sitesAPI } from '@/lib/api'
-
-const publicPaths = ['/login', '/register']
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
-  const router = useRouter()
-  const { setUser, setSites, setSelectedSite, selectedSite } = useAppStore()
+  const { setUser, user } = useAppStore()
   const [loading, setLoading] = useState(true)
-  const isPublic = publicPaths.includes(pathname)
 
   useEffect(() => {
-    const init = async () => {
-      const token = localStorage.getItem('access_token')
-      if (!token) {
-        if (!isPublic) router.push('/login')
-        setLoading(false)
-        return
-      }
-      try {
-        const { data: user } = await authAPI.me()
-        setUser(user)
-        try {
-          const { data: sites } = await sitesAPI.list()
-          const siteList = Array.isArray(sites) ? sites : sites.items || []
-          setSites(siteList)
-          if (siteList.length > 0 && !selectedSite) {
-            setSelectedSite(siteList[0])
-          }
-        } catch {
-          // Sites API may fail, that's okay
-        }
-      } catch {
-        localStorage.removeItem('access_token')
-        if (!isPublic) router.push('/login')
-      }
-      setLoading(false)
+    // Set a default dev user so the dashboard is accessible without auth
+    if (!user) {
+      setUser({ id: 1, email: 'dev@piebot.local', full_name: 'PieBot Dev' })
     }
-    init()
+    setLoading(false)
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   if (loading) {
@@ -56,7 +29,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     )
   }
 
-  if (isPublic) {
+  // Login/register pages render without sidebar
+  if (pathname === '/login' || pathname === '/register') {
     return <>{children}</>
   }
 
